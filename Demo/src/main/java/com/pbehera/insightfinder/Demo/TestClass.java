@@ -14,7 +14,7 @@ public class TestClass {
 
 		try {
 			
-			Json2CSVParser json2csvParser = new Json2CSVParser("/home/pbehera/data1.txt", "/home/pbehera/output.csv");
+			Json2CSVParser json2csvParser = new Json2CSVParser("/home/pbehera/data2.txt", "/home/pbehera/output2.csv");
 			json2csvParser.generateCSVFile();
 			
 			for(String assetId: json2csvParser.instantStatsMap.keySet())
