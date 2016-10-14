@@ -19,14 +19,60 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-public class CSVConverter {
+public class CSVConverterToBigFile {
 
 	public static String sourceCSVFile = "/home/pbehera/output1.csv";
 	public static String sourceCSVFile2 = "/home/pbehera/output2.csv";
 	static DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'hh:mm:ss");
-	public static String destinationCSVFile = "/home/pbehera/output3.csv";
+	public static String destinationCSVFile = "/home/pbehera/output_big.csv";
 	private static final String COMMA_DELIMITER = ",";
 	private static final String NEW_LINE_SEPARATOR = "\n";
+	
+	public static Integer getGroupId(String fieldname)
+	{
+		switch(fieldname)
+		{
+		case "cpu-usedPercent.avg":
+			return 1;
+		case "cpu-usedPercent.max":
+			return 2;
+		case "cpu-usedPercent.min":
+			return 3;
+		case "memory-free.avg":
+			return 4;
+		case "memory-free.max":
+			return 5;
+		case "memory-free.min":
+			return 6;
+		case "memory-usedPercent.avg":
+			return 7;
+		case "memory-usedPercent.max":
+			return 8;
+		case "memory-usedPercent.min":
+			return 9;
+		case "fs-size.avg":
+			return 10;
+		case "fs-size.max":
+			return 11;
+		case "fs-size.min":
+			return 12;
+		case "fs-used.avg":
+			return 13;
+		case "fs-used.max":
+			return 14;
+		case "fs-used.min":
+			return 15;
+		case "fs-usedPercent.avg":
+			return 16;
+		case "fs-usedPercent.max":
+			return 17;
+		case "fs-usedPercent.min":
+			return 18;
+		
+		}
+		return null;
+	}
+	
 	
 	public static Integer findNumOfTimestamps(Map<InstanceDataPoint, List<Object>> finalData)
 	{
@@ -143,15 +189,22 @@ public class CSVConverter {
 	}
 
 	
-	public static void main(String[] args) throws ParseException, IOException {
+	public static void main(String[] args) throws ParseException, IOException
+	{
+		Date startTime = df.parse("2016-07-15T21:15:00");
+		Date endTime = df.parse("2016-07-15T21:15:00");
+		generateOutputCSVFile(sourceCSVFile, sourceCSVFile2, startTime, endTime, destinationCSVFile);
+	}
+	
+	static void generateOutputCSVFile(String sourceCSVFile, String sourceCSVFile2, Date startTime, Date endTime, String destinationCSVFile) throws IOException, ParseException
+	 {
 		// TODO Auto-generated method stub
 		
 		File file = new File(sourceCSVFile);
 		Scanner sc = new Scanner(new File(sourceCSVFile));
 		File file2 = new File(sourceCSVFile2);
 		Scanner sc2 = new Scanner(new File(sourceCSVFile2));
-		Date startTime = df.parse("2016-07-15T21:15:00");
-		Date endTime = df.parse("2016-07-15T21:15:00");
+		
 		
 		String line = sc.nextLine();
 		
@@ -293,58 +346,61 @@ public class CSVConverter {
 			System.out.println("InstanceId: " + assetId + " InstanceCount: " + instanceOccurenceMap.get(assetId));
 		}
 		
-		
-		
-		FileWriter fileWriter = new FileWriter(destinationCSVFile);
-		
-		fileWriter.append("timestamp");
-		
-		int counter = 0;
-		
-		for(String instance : topInstances)
-		{
-			for(int i=2; i < fieldNames.size(); i++)
-			{
-				fileWriter.append(COMMA_DELIMITER);
-				fileWriter.append(fieldNames.get(i)+":"+instance);
-				counter++;
-			}
-		}
-		
-		System.out.println("Total count of columns: " + counter++);
-		fileWriter.append(NEW_LINE_SEPARATOR);
-		
-		for(Date timestamp: findTimestamps(finalData))
-		{
-			fileWriter.append(df.format(timestamp));
+
+			FileWriter fileWriter = new FileWriter(destinationCSVFile);
 			
-			for(String instance:topInstances)
+			fileWriter.append("timestamp");
+			
+			int counter = 0;
+			
+			for(int k=0; k<topInstances.size(); k++)
 			{
-				InstanceDataPoint instanceDataPoint = new InstanceDataPoint(instance, timestamp);
-				if(finalData.keySet().contains(instanceDataPoint))
+				String instance = topInstances.get(k);
+				for(int i=2; i < fieldNames.size(); i++)
 				{
-					List<Object> data = finalData.get(instanceDataPoint);
-					
-					for(int i=2; i < fieldNames.size(); i++)
-					{
-						fileWriter.append(COMMA_DELIMITER);
-						fileWriter.append(data.get(i).toString());
-					}
-				}
-				else
-				{
-					for(int i=2; i < fieldNames.size(); i++)
-					{
-						fileWriter.append(COMMA_DELIMITER);
-					}
+					fileWriter.append(COMMA_DELIMITER);
+					fileWriter.append(fieldNames.get(i).replace(':', '-') +"["+instance+"]:"+getGroupId(fieldNames.get(i).replace(':', '-')));
+					counter++;
 				}
 			}
+			
+			System.out.println("Total count of columns: " + counter++);
 			fileWriter.append(NEW_LINE_SEPARATOR);
+			
+			for(Date timestamp: findTimestamps(finalData))
+			{
+				fileWriter.append(String.valueOf(timestamp.getTime()));
+				
+				for(int k=0; k<topInstances.size(); k++)
+				{
+					String instance = topInstances.get(k);
+					InstanceDataPoint instanceDataPoint = new InstanceDataPoint(instance, timestamp);
+					if(finalData.keySet().contains(instanceDataPoint))
+					{
+						List<Object> data = finalData.get(instanceDataPoint);
+						
+						for(int i=2; i < fieldNames.size(); i++)
+						{
+							fileWriter.append(COMMA_DELIMITER);
+							fileWriter.append(data.get(i).toString());
+						}
+					}
+					else
+					{
+						for(int i=2; i < fieldNames.size(); i++)
+						{
+							fileWriter.append(COMMA_DELIMITER);
+						}
+					}
+				}
+				fileWriter.append(NEW_LINE_SEPARATOR);
+			}
+			
+			fileWriter.flush();
+			fileWriter.close();
+		
 		}
 		
-		fileWriter.flush();
-		fileWriter.close();
 		
-	}
 
 }
