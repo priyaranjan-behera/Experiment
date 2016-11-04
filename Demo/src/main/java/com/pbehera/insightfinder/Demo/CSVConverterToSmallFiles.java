@@ -35,43 +35,44 @@ public class CSVConverterToSmallFiles {
 		case "cpu-usedPercent.avg":
 			return 1;
 		case "cpu-usedPercent.max":
-			return 2;
+			return 1;
 		case "cpu-usedPercent.min":
-			return 3;
+			return 1;
 		case "memory-free.avg":
-			return 4;
+			return 2;
 		case "memory-free.max":
-			return 5;
+			return 2;
 		case "memory-free.min":
-			return 6;
+			return 2;
 		case "memory-usedPercent.avg":
-			return 7;
+			return 3;
 		case "memory-usedPercent.max":
-			return 8;
+			return 3;
 		case "memory-usedPercent.min":
-			return 9;
+			return 3;
 		case "fs-size.avg":
-			return 10;
+			return 4;
 		case "fs-size.max":
-			return 11;
+			return 4;
 		case "fs-size.min":
-			return 12;
+			return 4;
 		case "fs-used.avg":
-			return 13;
+			return 5;
 		case "fs-used.max":
-			return 14;
+			return 5;
 		case "fs-used.min":
-			return 15;
+			return 5;
 		case "fs-usedPercent.avg":
-			return 16;
+			return 6;
 		case "fs-usedPercent.max":
-			return 17;
+			return 6;
 		case "fs-usedPercent.min":
-			return 18;
+			return 6;
 		
 		}
 		return null;
 	}
+	
 	
 	public static Integer findNumOfTimestamps(Map<InstanceDataPoint, List<Object>> finalData)
 	{
